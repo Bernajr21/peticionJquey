@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peticion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito&display=swap" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <style>
+        * {
+            font-family: 'Nunito', sans-serif;
+
+        }
+
+        .tabla {
+            width: 100%;
+        }
+
+        table {
+
+            margin-left: 20px;
+            margin-bottom: 20px;
+            width: 70%;
+            border: 1px solid #000;
+            border-collapse: collapse;
+            -webkit-box-shadow: 10px 10px 79px 0px rgba(0, 0, 0, 0.43);
+            -moz-box-shadow: 10px 10px 79px 0px rgba(0, 0, 0, 0.43);
+            box-shadow: 10px 10px 79px 0px rgba(0, 0, 0, 0.43);
+
+        }
+
+        th,
+        td {
+            text-align: left;
+            vertical-align: center;
+            border: 1px solid #000;
+            padding: 0.3em;
+            caption-side: bottom;
+        }
+
+        caption {
+            padding: 0.3em;
+            color: #fff;
+            background: #000;
+        }
+
+        th {
+            background: purple;
+            color: white;
+            text-align: center;
+        }
+
+        tr {
+            -o-transition: all 500ms ease;
+            -webkit-transition: all 500ms ease;
+            transition: all 500ms ease;
+        }
+
+        tr:hover {
+            background-color: violet;
+            color: white;
+            cursor: pointer;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+        ul.list_fotos li{
+            display: inline;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Lista de Álbunes</h1>
+    <div class="output">
+        <select class="lista">
+        </select>
+        <ul class="lista_fotos"></ul>
+    </div>
+    <ul class="list_fotos">
+    </ul>
+    <div class="tabla">
+        <table>
+            <thead>
+                <tr>
+                    <th>userId</th>
+                    <th>Id</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                </tr>
+            </thead>
+            <tbody class="list_post">
+
+            </tbody>
+        </table>
+
+
+    </div>
+
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("select.lista").empty();
+            $.ajax("https://jsonplaceholder.typicode.com/albums", {
+                dataType: 'json',
+                success: function (data) {
+                    data.forEach(function (valor) {
+                        $("select.lista").append("<option value ='" + valor.id + "'>" + valor.title + "</option>");
+
+                        $(".option").on('click', function (event) {
+                            $("ul.lista_fotos").empty();
+                        });
+                    })
+                },
+                error: function (jqXHR, texStatus, error) {
+                    alert("Error:" + texStatus + " " + error);
+                }
+            });
+
+            $(".list_post").empty();
+            $.ajax("https://jsonplaceholder.typicode.com/posts", {
+                dataType: 'json',
+                success: function (data) {
+                    var e = 10;
+                    for (i = 0; i < e; i++) {
+                        let userId = data[i].userId;
+                        let id = data[i].id;
+                        let title = data[i].title;
+                        let body = data[i].body;
+
+                        $('.list_post').append(
+                            "<tr>\n<td >" + userId + "</td>\n<td class='id'>" + id + "</td>\n<td>" + title + "</td>\n<td>" + body + "</td>\n</td>"
+                        );
+                    }
+                }
+            });
+
+            $('.lista').change(function () {
+                let selectedOption = $('.lista option:selected');
+                let id = selectedOption.val();
+                let url = " https://jsonplaceholder.typicode.com/photos?albumId=" + id;
+                console.log(url);
+                $("ul.list_fotos").empty();
+                $.ajax(url, {
+                    dataType: 'json',
+                    success: function (data) {
+                        for (i = 0; i < 3; i++) {
+                            $("ul.list_fotos").append("<li class='elemento'><img src='" + data[i].thumbnailUrl + "' /></li>")
+                        }
+                    }
+                })
+            });
+
+            $(".oction").on("click", "tr", function (event) {
+                let id = $(this).children("td.id").eq(0).text();
+                let url = "https://jsonplaceholder.typicode.com/users?id=" + id;
+
+                $.ajax(url, {
+                    dataType: 'json',
+                    success: function (data) {
+                        let nombre = data[0].name;
+                        let apellido = data[0].username;
+                        let email = data[0].email;
+                        let phone = data[0].phone;
+                        let company = data[0].company.name;
+                        let web = data[0].website;
+                        let city = data[0].address.city;
+
+                        alert("Apellidos: " + nombre + "\n" + "Nombre: " + apellido + "\n" + "Email: " + email + "\n" + "Teléfono: " + phone + "\n" + "Compañía: " + company + "\n" + "Web: " + web + "\n" + "Ciudad: " + city);
+                    },
+                    error: function (jqXHR, texStatus, error) {
+                        alert("Error:" + texStatus + " " + error);
+                    }
+                });
+            });
+            $("ul.list_fotos").change(function () {
+                $(this).removeClass("elemento");
+            });
+        });
+    </script>
+</body>
+
+</html>
